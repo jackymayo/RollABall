@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 {
 
     public float speed;
+	public float ricochetSpeed;
     public Text countText;
     public Text winText;
 
@@ -46,11 +47,13 @@ public class PlayerController : MonoBehaviour
         {
 
             RestartGame();
-
         }
     }
     void FixedUpdate()
     {
+		if (rb.transform.position.y <= -5) {
+			RestartGame();
+		}
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
@@ -59,6 +62,10 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+		if (other.gameObject.CompareTag("Death")) {
+			RestartGame();
+		}
+			
         if (other.gameObject.CompareTag("Pick Up"))
         {
             listOfInactivePickUps.Add(other.gameObject);
@@ -66,8 +73,11 @@ public class PlayerController : MonoBehaviour
             count += 1;
             SetCountText();
         }
+		if (other.gameObject.CompareTag("Ricochet")) {
+			rb.AddForce (new Vector3 (0, ricochetSpeed, 0));
+		}
         if (count >= numOfPickUps)
-        {
+        {	
             winText.enabled = true;
         }
     }
